@@ -1,0 +1,15 @@
+{
+  "name": "부인FC 글도우미",
+  "short_name": "부인FC",
+  "description": "말로 부르면 밴드·카톡 공지가 완성됩니다",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1B7A43",
+  "lang": "ko",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
