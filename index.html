@@ -635,7 +635,7 @@ function renderSettings() {
 
 /* ================= 음성 인식 ================= */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, voiceOn = false, armed = false;
+let rec = null, voiceOn = false, armed = false, micGranted = false, restartTimer = null;
 
 function norm(s) { return (s||"").toLowerCase().replace(/[\s.,!?~'"()\-]/g,""); }
 
@@ -648,29 +648,72 @@ function setMic(on) {
     : "마이크를 눌러 음성으로 시작하세요";
 }
 
-function startRec() {
-  if (!SR) { toast("이 브라우저는 음성 인식을 지원하지 않아요 (크롬 권장)"); return; }
+function ensureMic() {
+  // 권한을 한 번만 깔끔히 확보해 두면, 이후 재시작은 조용히 됩니다(반복 팝업 방지)
+  if (micGranted) return Promise.resolve(true);
+  if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) return Promise.resolve(true);
+  return navigator.mediaDevices.getUserMedia({ audio: true })
+    .then((s) => { s.getTracks().forEach(t => t.stop()); micGranted = true; return true; })
+    .catch(() => false);
+}
+
+function launchRec() {
   try {
     rec = new SR();
-    rec.lang = "ko-KR"; rec.continuous = true; rec.interimResults = false;
+    rec.lang = "ko-KR";
+    rec.continuous = false;   // 안드로이드 크롬은 continuous 미지원 → 짧게 듣고 조용히 재시작
+    rec.interimResults = false;
     rec.onresult = (e) => {
       const said = e.results[e.results.length-1][0].transcript.trim();
       if (said) handleSpeech(said);
     };
     rec.onerror = (e) => {
       if (e.error === "not-allowed" || e.error === "service-not-allowed") {
-        setMic(false); toast("마이크 권한을 허용해 주세요");
+        micGranted = false; setMic(false);
+        toast("마이크 권한이 꺼져 있어요 — 주소창 왼쪽 자물쇠 → 마이크 → 허용");
+        speak("마이크 권한을 허용해 주세요.");
       }
+      // no-speech·aborted·network 등은 onend에서 재시작 처리
     };
-    rec.onend = () => { if (voiceOn) { try { rec.start(); } catch(e){} } };
+    rec.onend = () => {
+      if (!voiceOn) return;
+      clearTimeout(restartTimer);
+      restartTimer = setTimeout(() => { if (voiceOn) { try { rec.start(); } catch(e){} } }, 350);
+    };
     rec.start();
-    setMic(true);
-    speak(cfg.wakeRequired ? "마이크를 켰어요. " + cfg.wake + ", 하고 불러 주세요." : "듣고 있어요. 경기 공지 눌러줘, 처럼 말씀하세요.");
-  } catch(e) { toast("음성 인식을 시작할 수 없어요"); }
+  } catch(e) { /* 이미 시작됨 등은 무시 */ }
 }
-function stopRec() { voiceOn = false; try { rec && rec.stop(); } catch(e){} setMic(false); speechSynthesis && speechSynthesis.cancel(); }
+
+function startRec() {
+  if (!SR) { toast("이 브라우저는 음성 인식을 지원하지 않아요 (크롬으로 열어 주세요)"); speak("음성 인식은 크롬에서 됩니다. 크롬으로 열어 주세요."); return; }
+  ensureMic().then((ok) => {
+    if (!ok) { setMic(false); toast("마이크 권한을 허용해 주세요 (주소창 왼쪽 자물쇠 → 마이크 → 허용)"); speak("마이크 권한을 허용해 주세요."); return; }
+    setMic(true);
+    launchRec();
+    speak(cfg.wakeRequired ? "마이크를 켰어요. " + cfg.wake + ", 하고 불러 주세요." : "듣고 있어요. 경기 공지 눌러줘, 처럼 말씀하세요.");
+  });
+}
+
+function stopRec() {
+  voiceOn = false;
+  clearTimeout(restartTimer);
+  try { if (rec) { rec.onend = null; rec.stop(); } } catch(e){}
+  setMic(false);
+  if (window.speechSynthesis) speechSynthesis.cancel();
+}
 
 $("#micFab").addEventListener("click", ()=> voiceOn ? stopRec() : startRec());
+
+// 카카오톡·밴드 등 인앱 브라우저 감지 → 크롬으로 열도록 안내 (음성이 원천적으로 안 되는 환경)
+(function detectInApp(){
+  var ua = navigator.userAgent || "";
+  var inApp = /KAKAOTALK|NAVER|\bBand\b|FB_IAB|FBAN|FBAV|Instagram|Line\//i.test(ua) || /;\s*wv\)/i.test(ua);
+  if (inApp) {
+    var label = document.getElementById("micLabel");
+    if (label) label.textContent = "카톡 화면에선 음성이 안 돼요 — 오른쪽 위 ⋮ → '다른 브라우저(Chrome)로 열기'";
+    setTimeout(function(){ toast("음성은 크롬에서만 됩니다. 오른쪽 위 ⋮ → 다른 브라우저로 열기"); }, 900);
+  }
+})();
 
 function visibleVoiceButtons() {
   return Array.from(document.querySelectorAll("[data-voice]")).filter(b => b.offsetParent !== null);
