@@ -798,4 +798,9 @@ $("#btnSettings").addEventListener("click", ()=>go("settings"));
 renderRole();
 render();
 if (!SR) toast("음성 인식은 안드로이드 크롬에서 가장 잘 됩니다");
+
+// PWA 설치(앱 설치) + 오프라인 지원
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+}
 </script>
