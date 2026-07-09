@@ -588,8 +588,16 @@ function renderPreview() {
       toast("복사했어요! 밴드/카톡에 붙여넣으세요"); speak("복사했어요. 밴드나 카톡에 붙여넣어 주세요.");
     }}));
   if (navigator.share) {
-    screenEl.appendChild(bigBtn({ icon:"share", label:"공유", sub:"밴드·카톡 앱으로 바로 보내기", cls:"outline", voice:"공유",
-      onClick:()=>{ navigator.share({ text }).catch(()=>{}); } }));
+    screenEl.appendChild(bigBtn({ icon:"share", label:"공유", sub:"→ 공유창에서 손으로 톡·밴드 선택", cls:"outline", voice:"공유",
+      onClick:()=>{
+        // 공유창은 폰 시스템 창이라 음성으로 못 누름 → 음성 인식만 끄고(TTS는 유지) 손터치 안내
+        voiceOn = false; clearTimeout(restartTimer);
+        try { if (rec) { rec.onend = null; rec.stop(); } } catch(e){}
+        setMic(false);
+        toast("공유창에선 손으로 카톡·밴드를 누르세요");
+        speak("공유창이 열리면, 손으로 카카오톡이나 밴드를 눌러 주세요.");
+        navigator.share({ text }).catch(()=>{});
+      } }));
   }
   screenEl.appendChild(bigBtn({ icon:"sound", label:"읽어줘", sub:"완성된 글을 소리로 확인", voice:"읽어줘|말해줘",
     onClick:()=>speak(text) }));
