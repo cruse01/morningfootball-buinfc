@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1B7A43">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
   /* ── Airbnb "따뜻한 동네 클럽" 테마 (흰 캔버스 + 잔디 그린 브랜드 컬러) ─── */
   :root {
@@ -237,6 +237,12 @@ const ICONS = {
   sound: `<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>`,
   check: `<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M4 12.5l5.5 5.5L20 7"/></svg>`,
   save:  `<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 14h8v6H8z"/></svg>`,
+  flower:`<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7.5" r="3"/><path d="M12 10.5c0 5-3.5 6.5-3.5 6.5M12 10.5c0 5 3.5 6.5 3.5 6.5M8.5 20h7"/></svg>`,
+  gift:  `<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3.5 9h17M12 9v11M12 9c-1-2-4-4-5-2s1 2 5 2c1-2 4-4 5-2s-1 2-5 2"/></svg>`,
+  won:   `<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7l3 10 3-8 2 8 3-10"/><path d="M3.5 11h17"/></svg>`,
+  trophy:`<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4h10v4a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M9 20h6M12 13v3"/></svg>`,
+  flag:  `<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 21V4M6 4h11l-2 4 2 4H6"/></svg>`,
+  person:`<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5"/></svg>`,
 };
 
 /* ================= 설정 ================= */
@@ -287,6 +293,11 @@ function speak(text) {
 
 /* ================= 템플릿 생성 ================= */
 function sign() { return cfg.signer ? "\n\n" + cfg.signer : ""; }
+
+/* 한글 조사 자동 선택 (받침 유무) */
+function hasBatchim(w) { if(!w) return false; const c = w.charCodeAt(w.length-1)-0xAC00; return (c>=0 && c<=11171) && (c%28)!==0; }
+function roJosa(w) { const c = w ? w.charCodeAt(w.length-1)-0xAC00 : -1; const b = (c>=0 && c<=11171) ? (c%28) : 0; return (b===0 || b===8) ? "로" : "으로"; } // ㄹ 받침은 '로'
+function eulJosa(w) { return hasBatchim(w) ? "을" : "를"; }
 
 const generators = {
   match(a) {
@@ -373,12 +384,102 @@ ${n ? "아직 참석 여부를 알려주지 않으신 분이 " + n + "분 계십
 ${n ? "아직 안 하신 분 " + n + "분! " : ""}밴드에서 꼭 투표 부탁드립니다~`;
     }
     return { band, talk };
+  },
+  obituary(a) {
+    const band =
+`▶ 부 고 ◀
+
+故 ${a.name}님께서 별세하셨기에 아래와 같이 부고를 전해 드립니다.
+
+■ 빈소 : ${a.place}
+■ 발인 : ${a.date}
+
+황망한 중에 일일이 연락드리지 못함을 널리 혜량하여 주시기 바랍니다.
+
+상주 ${a.chief} 배상`;
+    const talk =
+`▶부고◀
+故 ${a.name}님께서 별세하셨습니다.
+· 빈소 : ${a.place}
+· 발인 : ${a.date}
+황망한 마음에 두루 알려 드립니다. 삼가 고인의 명복을 빕니다.
+상주 ${a.chief} 배상`;
+    return { band, talk };
+  },
+  sponsor(a) {
+    const use = a.use ? "\n" + a.use : "";
+    const band =
+`◇ 찬조 알림 ◇
+
+${a.who}님께서 ${a.reason}${roJosa(a.reason)} ${a.amount}${eulJosa(a.amount)} 찬조해 주셨습니다.
+따뜻한 마음에 깊이 감사드립니다.${use}
+
+회원 여러분께 알려 드립니다.${sign()}`;
+    const talk =
+`◇찬조 알림◇
+${a.who}님께서 ${a.reason}${roJosa(a.reason)} ${a.amount} 찬조해 주셨습니다.${use}
+감사합니다~ 많이 참석하셔서 함께해 주세요!`;
+    return { band, talk };
+  },
+  dues(a) {
+    const od = a.overdue === "예";
+    const band =
+`◇ ${a.month} ${a.kind} 공지 ◇
+
+아래와 같이 내역을 공지해 드리오니 참고하시기 바랍니다.
+${od ? "송구하오나 회비를 미납하신 회원님께서는 조속히 납부해 주시면 감사하겠습니다.\n" : ""}자세한 내역은 첨부한 사진을 확인해 주시기 바랍니다.${sign()}`;
+    const talk =
+`◇${a.month} ${a.kind}◇
+내역 공지드립니다. 밴드에서 확인 부탁드려요.${od ? "\n회비 미납하신 분들은 조속히 납부 부탁드립니다~" : ""}`;
+    return { band, talk };
+  },
+  cheer(a) {
+    const band =
+`${a.date} ${a.title}
+
+■ 대진 : 부인FC vs ${a.vs}
+
+우리 선수들 부상 없이 멋진 경기 펼치길 응원합니다.
+회원님들의 많은 응원 부탁드립니다!${sign()}`;
+    const talk =
+`⚽ ${a.title}
+${a.date} 부인FC vs ${a.vs}
+화이팅하십쇼~! 많이들 응원 나와 주세요!`;
+    return { band, talk };
+  },
+  opening(a) {
+    const band =
+`== 시축식 안내 ==
+
+새해를 맞아 부인FC 시축식을 아래와 같이 진행합니다.
+
+■ 일시 : ${a.date}
+■ 장소 : ${a.place}
+
+전 회원님께서는 빠짐없이 참석하시어
+한 해 무사고와 건강을 함께 기원해 주시기 바랍니다.${sign()}`;
+    const talk =
+`== 시축식 안내 ==
+${a.date} · ${a.place}
+새해 첫 모임입니다. 빠짐없이 나오셔서 무사고 기원해요~`;
+    return { band, talk };
+  },
+  welcome(a) {
+    const band =
+`새로 가입하신 ${a.name} 회원님을 소개합니다. (${a.year}년생)
+
+회원 여러분, 따뜻하게 환영해 주시기 바랍니다.${sign()}`;
+    const talk =
+`🎉 새 회원 ${a.name}님 (${a.year}년생) 가입!
+다들 따뜻하게 환영해 주세요~ 👏`;
+    return { band, talk };
   }
 };
 
 /* ================= 마법사 흐름 정의 ================= */
 function flowDefs() {
   const sun0 = fmtDate(nextSunday(0)), sun1 = fmtDate(nextSunday(1));
+  const mNow = (new Date().getMonth()+1) + "월분";
   return {
     match: {
       title: "경기 공지", gen: "match",
@@ -463,6 +564,77 @@ function flowDefs() {
           { label:"유머 톤", value:"유머", sub:"감독님 스타일 — \"밀린 숙제 끝내시고~\"", voice:["유머","재밌게","감독"] },
           { label:"정중 톤", value:"정중", sub:"총무님 스타일 — 격식 있는 안내", voice:["정중","공손","총무"] } ] },
       ]
+    },
+    obituary: {
+      title: "부고", gen: "obituary",
+      steps: [
+        { key:"name", q:"고인 성함은?", type:"text", textPrompt:"고인 성함을 말씀해 주세요 (예: 홍길동)" },
+        { key:"place", q:"빈소는 어디인가요?", type:"text", textPrompt:"장례식장과 호실 (예: OO병원 장례식장 3호실)" },
+        { key:"date", q:"발인은 언제인가요?", type:"text", textPrompt:"발인 일시 (예: 7월 20일 오전)" },
+        { key:"chief", q:"상주 성함은?", type:"text", textPrompt:"상주 성함을 말씀해 주세요" },
+      ]
+    },
+    sponsor: {
+      title: "찬조 알림", gen: "sponsor",
+      steps: [
+        { key:"who", q:"누가 찬조하셨나요?", type:"text", textPrompt:"찬조하신 분 성함 (예: 김상호 부회장)" },
+        { key:"reason", q:"무슨 일로 찬조하셨나요?", type:"text", textPrompt:"사유 (예: 승진 축하, 조사 답례)" },
+        { key:"amount", q:"얼마를 찬조하셨나요?", type:"text", textPrompt:"금액 (예: 30만원)" },
+        { key:"use", q:"어디에 쓰이나요?", type:"choice", opts:[
+          { label:"중식비(식사)로 지원", value:"이번 일요일 중식비로 사용됩니다.", voice:["식사","중식","밥","점심"] },
+          { label:"회비에 보탬", value:"회비에 보탬이 됩니다.", voice:["회비"] },
+          { label:"직접 입력", value:"__text__", voice:["직접","직접 입력"] },
+          { label:"안 넣음", value:"", voice:["없음","안 넣어","건너뛰기"] } ],
+          textPrompt:"용처를 말씀해 주세요" },
+      ]
+    },
+    dues: {
+      title: "회비·감사 공지", gen: "dues",
+      steps: [
+        { key:"month", q:"몇 월분인가요?", type:"choice", opts:[
+          { label:mNow, value:mNow, voice:["이번달","이번 달"] },
+          { label:"직접 입력", value:"__text__", voice:["직접","직접 입력"] } ],
+          textPrompt:"예: 7월분, 2/4분기" },
+        { key:"kind", q:"어떤 공지인가요?", type:"choice", opts:[
+          { label:"회비·입출금 내역", value:"회비 및 입·출금 내역", voice:["회비","입출금","내역"] },
+          { label:"분기 감사보고", value:"감사보고", voice:["감사","감사보고","분기"] } ] },
+        { key:"overdue", q:"미납 독려 문구를 넣을까요?", type:"choice", opts:[
+          { label:"네, 넣어주세요", value:"예", voice:["네","예","넣어"] },
+          { label:"아니요", value:"아니오", voice:["아니","아니요","안 넣어"] } ] },
+      ]
+    },
+    cheer: {
+      title: "대회 응원", gen: "cheer",
+      steps: [
+        { key:"title", q:"무슨 대회인가요?", type:"text", textPrompt:"대회 이름 (예: 제30회 부천시 축구연합회장기)" },
+        { key:"vs", q:"상대 팀은?", type:"text", textPrompt:"상대 팀 이름 (예: 성주FC)" },
+        { key:"date", q:"언제 경기인가요?", type:"choice", opts:[
+          { label:"이번주 일요일", value:sun0, sub:sun0, voice:["이번주","이번주 일요일"] },
+          { label:"직접 입력", value:"__text__", voice:["직접","직접 입력"] } ],
+          textPrompt:"경기 날짜 (예: 6월 26일)" },
+      ]
+    },
+    opening: {
+      title: "시축식 안내", gen: "opening",
+      steps: [
+        { key:"date", q:"언제 하나요?", type:"choice", opts:[
+          { label:"1월 둘째 일요일 오전 10시", value:"1월 둘째 일요일 오전 10시", voice:["1월","둘째","시축식"] },
+          { label:"직접 입력", value:"__text__", voice:["직접","직접 입력"] } ],
+          textPrompt:"일시 (예: 1월 12일 오전 10시)" },
+        { key:"place", q:"어디서 하나요?", type:"choice", opts:[
+          { label:"심원고등학교", value:"심원고등학교", voice:["심원고","심원"] },
+          { label:"부인초등학교", value:"부인초등학교", voice:["부인초"] },
+          { label:"인천폴리텍대학", value:"인천폴리텍대학", voice:["폴리텍"] },
+          { label:"직접 입력", value:"__text__", voice:["직접","직접 입력"] } ],
+          textPrompt:"장소를 말씀해 주세요" },
+      ]
+    },
+    welcome: {
+      title: "신입 환영", gen: "welcome",
+      steps: [
+        { key:"name", q:"새 회원 성함은?", type:"text", textPrompt:"새로 가입한 회원 성함" },
+        { key:"year", q:"출생연도는?", type:"text", textPrompt:"출생연도 (예: 64)" },
+      ]
     }
   };
 }
@@ -528,6 +700,18 @@ function renderHome() {
     { icon:"vote", label:"투표 독려", sub:"참석 투표 안 하신 분들께 재촉", voice:"투표 독려|투표|독려", key:"nudge", block:"coral" },
   ];
   menu.forEach(m => screenEl.appendChild(bigBtn({...m, onClick:()=>{ speak(m.label + "를 시작할게요."); startFlow(m.key); }})));
+
+  screenEl.appendChild(el(`<p class="eyebrow" style="margin-top:22px">더 많은 공지</p>`));
+  const more = [
+    { icon:"flower", label:"부고", sub:"▶부고◀ 정형 서식", voice:"부고", key:"obituary" },
+    { icon:"gift", label:"찬조 알림", sub:"누가·왜·금액·용처", voice:"찬조 알림|찬조", key:"sponsor" },
+    { icon:"won", label:"회비·감사 공지", sub:"월별/분기 내역 + 미납 독려", voice:"회비 공지|회비|감사 공지", key:"dues" },
+    { icon:"trophy", label:"대회 응원", sub:"대진 + 화이팅", voice:"대회 응원|대회|응원", key:"cheer" },
+    { icon:"flag", label:"시축식 안내", sub:"새해 첫 모임(1월 둘째 일요일)", voice:"시축식 안내|시축식", key:"opening" },
+    { icon:"person", label:"신입 환영", sub:"이름 + 출생연도 소개", voice:"신입 환영|신입|환영", key:"welcome" },
+  ];
+  more.forEach(m => screenEl.appendChild(bigBtn({...m, onClick:()=>{ speak(m.label + "를 시작할게요."); startFlow(m.key); }})));
+
   if (state.lastResult) {
     screenEl.appendChild(bigBtn({ icon:"doc", label:"마지막 글 다시 보기", voice:"다시 보기|마지막 글",
       onClick:()=>{ state.result = state.lastResult; go("preview"); } }));

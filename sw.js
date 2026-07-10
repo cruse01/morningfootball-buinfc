@@ -1,6 +1,6 @@
 /* 부인FC 글도우미 서비스워커 — 네트워크 우선(항상 최신) + 오프라인 대비 */
-const CACHE = "buinfc-v1";
-const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
+const CACHE = "buinfc-v2";
+const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(

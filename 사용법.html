@@ -2,20 +2,22 @@
 <title>부인FC 글도우미 사용법</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  /* 나이트 피치 — 앱과 동일 토큰 (단일 다크, 의도된 커밋) */
+  /* Airbnb 라이트 테마 — 앱과 동일 (흰 캔버스 + 잔디 그린). 변수명(--lime)은 유지, 값만 그린 */
   :root {
-    color-scheme: dark;
-    --bg0:#0C130F; --bg1:#0A1B12;
-    --ink:#F0F6F1; --muted:#8FA396;
-    --lime:#C8F542; --lime-soft:rgba(200,245,66,.14);
-    --card:rgba(255,255,255,.055); --card-line:rgba(255,255,255,.10);
-    --danger:#F0708F;
+    color-scheme: light;
+    --canvas:#ffffff;
+    --ink:#222222; --muted:#6a6a6a;
+    --lime:#1B7A43; --lime-soft:rgba(27,122,67,.12);
+    --card:#ffffff; --card-line:#e6e6e6;
+    --surface:#f7f5f2;
+    --shadow:0 6px 20px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.05);
+    --danger:#c13515;
   }
   * { box-sizing:border-box; }
-  html { background:#0C130F; }
+  html { background:var(--canvas); }
   body {
     margin:0; color:var(--ink);
-    background:linear-gradient(170deg,var(--bg0) 0%,var(--bg1) 100%) fixed;
+    background:var(--canvas);
     font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",sans-serif;
     font-size:19px; line-height:1.65; -webkit-text-size-adjust:100%;
   }
@@ -26,7 +28,7 @@
   .app-badge {
     width:88px; height:88px; border-radius:26px; background:var(--lime);
     display:flex; align-items:center; justify-content:center;
-    margin:0 auto 16px; box-shadow:0 0 40px rgba(200,245,66,.3);
+    margin:0 auto 16px; box-shadow:var(--shadow);
   }
   header h1 { font-size:30px; margin:0 0 6px; letter-spacing:-.5px; text-wrap:balance; }
   header .sub { color:var(--muted); font-size:17px; margin:0; }
@@ -43,7 +45,7 @@
   }
   .eyebrow .num {
     width:30px; height:30px; border-radius:10px; flex:none;
-    background:var(--lime); color:#0D1912; font-size:15px;
+    background:var(--lime); color:#ffffff; font-size:15px;
     display:flex; align-items:center; justify-content:center; letter-spacing:0;
   }
   section h2 { font-size:24px; margin:0 0 14px; letter-spacing:-.3px; text-wrap:balance; }
@@ -53,7 +55,7 @@
 
   .card {
     background:var(--card); border:1px solid var(--card-line);
-    border-radius:20px; padding:20px; margin-bottom:12px;
+    border-radius:20px; padding:20px; margin-bottom:12px; box-shadow:var(--shadow);
   }
   .card h3 { font-size:19px; margin:0 0 8px; }
   .card p { margin:0; font-size:17px; }
@@ -66,7 +68,7 @@
   .step .n {
     counter-increment:step; flex:none;
     width:34px; height:34px; border-radius:50%;
-    background:var(--lime); color:#0D1912; font-weight:800; font-size:17px;
+    background:var(--lime); color:#ffffff; font-weight:800; font-size:17px;
     display:flex; align-items:center; justify-content:center; margin-top:2px;
   }
   .step .n::before { content:counter(step); }
@@ -77,7 +79,7 @@
   .os-tabs { display:flex; gap:8px; margin:14px 0 12px; }
   .os-tab { flex:1; text-align:center; padding:10px; border-radius:13px; font-weight:800; font-size:16px;
     background:var(--card); border:1px solid var(--card-line); color:var(--muted); }
-  .os-tab.on { background:var(--lime); color:#0D1912; border-color:var(--lime); }
+  .os-tab.on { background:var(--lime); color:#ffffff; border-color:var(--lime); }
 
   /* 음성 규칙 */
   .rule {
@@ -96,7 +98,7 @@
   /* 대화 예시 */
   .talk { display:flex; flex-direction:column; gap:10px; margin:16px 0; }
   .bubble { max-width:86%; padding:12px 18px; border-radius:22px; font-size:18px; line-height:1.5; }
-  .bubble.user { align-self:flex-end; background:var(--lime); color:#0D1912;
+  .bubble.user { align-self:flex-end; background:var(--lime); color:#ffffff;
     border-bottom-right-radius:6px; font-weight:700; }
   .bubble.app { align-self:flex-start; background:var(--card); border:1px solid var(--card-line);
     color:var(--ink); border-bottom-left-radius:6px; }
@@ -108,9 +110,9 @@
   .tpl b { display:block; font-size:16.5px; margin-bottom:3px; }
   .tpl span { color:var(--muted); font-size:14px; line-height:1.4; display:block; }
   .tpl.soon { opacity:.55; }
-  .badge { display:inline-block; font-size:11.5px; font-weight:800; color:#0D1912; background:var(--lime);
+  .badge { display:inline-block; font-size:11.5px; font-weight:800; color:#ffffff; background:var(--lime);
     border-radius:7px; padding:1px 7px; margin-bottom:7px; }
-  .badge.gray { background:rgba(255,255,255,.18); color:var(--ink); }
+  .badge.gray { background:var(--card-line); color:var(--muted); }
 
   /* 표 */
   .tbl-wrap { overflow-x:auto; border-radius:16px; border:1px solid var(--card-line); }
@@ -136,9 +138,9 @@
   a { color:var(--lime); }
 
   /* 설치 그림 스텝 (60대 친화) */
-  .istep { background:var(--card); border:1px solid var(--card-line); border-radius:20px; padding:16px 16px 18px; margin-bottom:14px; }
+  .istep { background:var(--card); border:1px solid var(--card-line); border-radius:20px; padding:16px 16px 18px; margin-bottom:14px; box-shadow:var(--shadow); }
   .istep .hd { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
-  .istep .n2 { flex:none; width:40px; height:40px; border-radius:50%; background:var(--lime); color:#0D1912; font-weight:800; font-size:20px; display:flex; align-items:center; justify-content:center; }
+  .istep .n2 { flex:none; width:40px; height:40px; border-radius:50%; background:var(--lime); color:#ffffff; font-weight:800; font-size:20px; display:flex; align-items:center; justify-content:center; }
   .istep h4 { margin:0; font-size:20.5px; letter-spacing:-.2px; }
   .istep .say { margin:0 0 4px; font-size:17.5px; line-height:1.55; }
   .istep .say b { color:var(--lime); }
@@ -159,9 +161,9 @@
   <header>
     <div class="app-badge">
       <svg width="52" height="52" viewBox="0 0 120 120" fill="none">
-        <circle cx="60" cy="46" r="19" stroke="#0D1912" stroke-width="9"/>
-        <path d="M60 36l9 6.5-3.4 10.6H54.4L51 42.5z" fill="#0D1912"/>
-        <path d="M37 52c0 15 10 25 23 25s23-10 23-25M60 77v14M46 94h28" stroke="#0D1912" stroke-width="9" stroke-linecap="round"/>
+        <circle cx="60" cy="46" r="19" stroke="#ffffff" stroke-width="9"/>
+        <path d="M60 36l9 6.5-3.4 10.6H54.4L51 42.5z" fill="#ffffff"/>
+        <path d="M37 52c0 15 10 25 23 25s23-10 23-25M60 77v14M46 94h28" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
       </svg>
     </div>
     <h1>부인FC 글도우미</h1>
@@ -192,9 +194,9 @@
         <circle cx="38" cy="35" r="6.5" fill="none" stroke="#8a8a8a" stroke-width="2"/>
         <text x="54" y="40" font-size="14.5" fill="#555">cruse01.github.io</text>
         <circle cx="288" cy="25" r="2.6" fill="#bbb"/><circle cx="288" cy="35" r="2.6" fill="#bbb"/><circle cx="288" cy="45" r="2.6" fill="#bbb"/>
-        <rect x="20" y="70" width="40" height="40" rx="12" fill="#C8F542"/>
-        <rect x="35" y="80" width="10" height="14" rx="5" fill="none" stroke="#0D1912" stroke-width="2.2"/>
-        <path d="M32 90 a8 8 0 0 0 16 0 M40 98 v5 M34 103 h12" fill="none" stroke="#0D1912" stroke-width="2.2" stroke-linecap="round"/>
+        <rect x="20" y="70" width="40" height="40" rx="12" fill="#1B7A43"/>
+        <rect x="35" y="80" width="10" height="14" rx="5" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+        <path d="M32 90 a8 8 0 0 0 16 0 M40 98 v5 M34 103 h12" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
         <text x="72" y="88" font-size="16" font-weight="700" fill="#111">부인FC 글도우미</text>
         <text x="72" y="106" font-size="13" fill="#888">말로 부르면 공지가 완성됩니다</text>
       </svg>
@@ -209,10 +211,10 @@
         <circle cx="38" cy="37" r="6.5" fill="none" stroke="#8a8a8a" stroke-width="2"/>
         <text x="54" y="42" font-size="14.5" fill="#555">부인FC 글도우미</text>
         <circle cx="288" cy="27" r="2.7" fill="#333"/><circle cx="288" cy="37" r="2.7" fill="#333"/><circle cx="288" cy="47" r="2.7" fill="#333"/>
-        <circle cx="288" cy="37" r="17" fill="none" stroke="#C8F542" stroke-width="4"/>
-        <rect x="176" y="82" width="132" height="40" rx="13" fill="#C8F542"/>
-        <path d="M283 82 l6 -12 l6 12 z" fill="#C8F542"/>
-        <text x="242" y="107" font-size="16" font-weight="700" fill="#0D1912" text-anchor="middle">여기를 누르세요</text>
+        <circle cx="288" cy="37" r="17" fill="none" stroke="#1B7A43" stroke-width="4"/>
+        <rect x="176" y="82" width="132" height="40" rx="13" fill="#1B7A43"/>
+        <path d="M283 82 l6 -12 l6 12 z" fill="#1B7A43"/>
+        <text x="242" y="107" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">여기를 누르세요</text>
         <rect x="18" y="74" width="150" height="11" rx="5" fill="#eee"/>
         <rect x="18" y="94" width="118" height="11" rx="5" fill="#f0f0f0"/>
       </svg>
@@ -232,9 +234,9 @@
         <text x="172" y="111" font-size="15" font-weight="700" fill="#2c3b0a">홈 화면에 추가</text>
         <text x="172" y="150" font-size="15" fill="#999">PC 버전으로 보기</text>
         <text x="172" y="180" font-size="15" fill="#999">설정</text>
-        <rect x="14" y="92" width="92" height="34" rx="11" fill="#C8F542"/>
-        <path d="M106 100 l12 6 l-12 6 z" fill="#C8F542"/>
-        <text x="60" y="114" font-size="15" font-weight="700" fill="#0D1912" text-anchor="middle">이것!</text>
+        <rect x="14" y="92" width="92" height="34" rx="11" fill="#1B7A43"/>
+        <path d="M106 100 l12 6 l-12 6 z" fill="#1B7A43"/>
+        <text x="60" y="114" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">이것!</text>
       </svg>
     </div>
 
@@ -245,15 +247,15 @@
         <rect x="4" y="4" width="312" height="182" rx="16" fill="#ffffff" stroke="#e2e2e2"/>
         <rect x="4" y="4" width="312" height="182" rx="16" fill="#000000" fill-opacity="0.30"/>
         <rect x="44" y="44" width="232" height="104" rx="16" fill="#ffffff"/>
-        <rect x="64" y="64" width="42" height="42" rx="12" fill="#C8F542"/>
-        <rect x="80" y="74" width="10" height="14" rx="5" fill="none" stroke="#0D1912" stroke-width="2.2"/>
-        <path d="M77 84 a8 8 0 0 0 16 0 M85 92 v6 M79 98 h12" fill="none" stroke="#0D1912" stroke-width="2.2" stroke-linecap="round"/>
+        <rect x="64" y="64" width="42" height="42" rx="12" fill="#1B7A43"/>
+        <rect x="80" y="74" width="10" height="14" rx="5" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+        <path d="M77 84 a8 8 0 0 0 16 0 M85 92 v6 M79 98 h12" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
         <text x="118" y="82" font-size="16" font-weight="700" fill="#111">홈 화면에 추가</text>
         <text x="118" y="102" font-size="13.5" fill="#666">부인FC 글도우미</text>
         <text x="176" y="131" font-size="14" fill="#999" text-anchor="middle">취소</text>
-        <rect x="208" y="114" width="58" height="26" rx="9" fill="#C8F542"/>
+        <rect x="208" y="114" width="58" height="26" rx="9" fill="#1B7A43"/>
         <rect x="208" y="114" width="58" height="26" rx="9" fill="none" stroke="#7fae1c" stroke-width="2.5"/>
-        <text x="237" y="132" font-size="15" font-weight="800" fill="#0D1912" text-anchor="middle">추가</text>
+        <text x="237" y="132" font-size="15" font-weight="800" fill="#ffffff" text-anchor="middle">추가</text>
       </svg>
       <p class="say" style="margin-top:14px">그러면 <b>바탕화면</b>에 라임색 마이크 아이콘이 생깁니다. 다음부터는 이 아이콘만 누르면 바로 열려요.</p>
       <svg class="shot" viewBox="0 0 320 170" style="font-family:'Malgun Gothic',sans-serif" role="img" aria-label="바탕화면에 생긴 앱 아이콘">
@@ -263,17 +265,17 @@
           <rect x="188" y="30" width="46" height="46" rx="13"/>
           <rect x="256" y="30" width="46" height="46" rx="13"/>
         </g>
-        <rect x="110" y="26" width="54" height="54" rx="15" fill="#C8F542"/>
-        <rect x="132" y="40" width="10" height="15" rx="5" fill="none" stroke="#0D1912" stroke-width="2.4"/>
-        <path d="M129 51 a8 8 0 0 0 16 0 M137 59 v6 M131 65 h12" fill="none" stroke="#0D1912" stroke-width="2.4" stroke-linecap="round"/>
-        <rect x="104" y="20" width="66" height="66" rx="18" fill="none" stroke="#C8F542" stroke-width="3"/>
+        <rect x="110" y="26" width="54" height="54" rx="15" fill="#1B7A43"/>
+        <rect x="132" y="40" width="10" height="15" rx="5" fill="none" stroke="#ffffff" stroke-width="2.4"/>
+        <path d="M129 51 a8 8 0 0 0 16 0 M137 59 v6 M131 65 h12" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
+        <rect x="104" y="20" width="66" height="66" rx="18" fill="none" stroke="#1B7A43" stroke-width="3"/>
         <text x="137" y="98" font-size="13" fill="#dfeede" text-anchor="middle" font-weight="700">부인FC</text>
         <text x="57" y="98" font-size="12" fill="#9db3a6" text-anchor="middle">밴드</text>
         <text x="211" y="98" font-size="12" fill="#9db3a6" text-anchor="middle">카톡</text>
         <text x="279" y="98" font-size="12" fill="#9db3a6" text-anchor="middle">전화</text>
-        <rect x="112" y="116" width="96" height="34" rx="12" fill="#C8F542"/>
-        <path d="M150 116 l7 -11 l7 11 z" fill="#C8F542"/>
-        <text x="160" y="138" font-size="15" font-weight="800" fill="#0D1912" text-anchor="middle">완성!</text>
+        <rect x="112" y="116" width="96" height="34" rx="12" fill="#1B7A43"/>
+        <path d="M150 116 l7 -11 l7 11 z" fill="#1B7A43"/>
+        <text x="160" y="138" font-size="15" font-weight="800" fill="#ffffff" text-anchor="middle">완성!</text>
       </svg>
     </div>
 
@@ -287,9 +289,9 @@
         <text x="60" y="60" font-size="15.5" fill="#222">마이크를 사용하도록</text>
         <text x="60" y="82" font-size="15.5" fill="#222">허용하시겠어요?</text>
         <text x="118" y="106" font-size="14" fill="#999" text-anchor="middle">차단</text>
-        <rect x="188" y="92" width="72" height="26" rx="9" fill="#C8F542"/>
+        <rect x="188" y="92" width="72" height="26" rx="9" fill="#1B7A43"/>
         <rect x="188" y="92" width="72" height="26" rx="9" fill="none" stroke="#7fae1c" stroke-width="2.5"/>
-        <text x="224" y="110" font-size="15" font-weight="800" fill="#0D1912" text-anchor="middle">허용</text>
+        <text x="224" y="110" font-size="15" font-weight="800" fill="#ffffff" text-anchor="middle">허용</text>
       </svg>
     </div>
 
@@ -309,11 +311,11 @@
           <rect x="151" y="120" width="18" height="18" rx="3"/>
           <path d="M160 124 v-11 M155 118 l5 -5 l5 5"/>
         </g>
-        <circle cx="160" cy="123" r="19" fill="none" stroke="#C8F542" stroke-width="4"/>
+        <circle cx="160" cy="123" r="19" fill="none" stroke="#1B7A43" stroke-width="4"/>
         <text x="238" y="132" font-size="18" fill="#999" text-anchor="middle">▭</text>
-        <rect x="112" y="44" width="96" height="34" rx="12" fill="#C8F542"/>
-        <path d="M151 78 l9 12 l9 -12 z" fill="#C8F542"/>
-        <text x="160" y="67" font-size="15" font-weight="700" fill="#0D1912" text-anchor="middle">공유 버튼</text>
+        <rect x="112" y="44" width="96" height="34" rx="12" fill="#1B7A43"/>
+        <path d="M151 78 l9 12 l9 -12 z" fill="#1B7A43"/>
+        <text x="160" y="67" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">공유 버튼</text>
       </svg>
     </div>
 
