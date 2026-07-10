@@ -243,6 +243,8 @@ const ICONS = {
   trophy:`<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4h10v4a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M9 20h6M12 13v3"/></svg>`,
   flag:  `<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 21V4M6 4h11l-2 4 2 4H6"/></svg>`,
   person:`<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5"/></svg>`,
+  board: `<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4.5h6V7H9zM9 12h6M9 16h4"/></svg>`,
+  mail:  `<svg class="i" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M4 7.5l8 5.5 8-5.5"/></svg>`,
 };
 
 /* ================= 설정 ================= */
@@ -473,6 +475,37 @@ ${a.date} · ${a.place}
 `🎉 새 회원 ${a.name}님 (${a.year}년생) 가입!
 다들 따뜻하게 환영해 주세요~ 👏`;
     return { band, talk };
+  },
+  meeting(a) {
+    const items = ((a.decisions||"").split(/[,，·]/).map(s=>s.trim()).filter(Boolean).map(s=>"■ "+s).join("\n")) || a.decisions;
+    const band =
+`== 임원회의 결과 공지 ==
+
+${a.date} 임원회의에서 아래와 같이 결정되었음을 알려드립니다.
+
+${items}
+
+세부 시간과 장소 등은 차후 별도로 공지해 드리겠습니다.${sign()}`;
+    const talk =
+`==임원회의 결과공지==
+${a.date} 회의 결정사항입니다.
+${items}
+자세한 건 차후 공지드릴게요~`;
+    return { band, talk };
+  },
+  official(a) {
+    const band =
+`[ 협회 공문 전달 ] ${a.title}
+
+* 일시 : ${a.date}
+* 대상 : ${a.target}
+${a.deadline ? "* 기한 : " + a.deadline + "\n\n" : "\n"}관심 있는 회원님은 총무에게 연락 주시기 바랍니다.${sign()}`;
+    const talk =
+`📋 [협회 공문] ${a.title}
+* 일시 : ${a.date}
+* 대상 : ${a.target}${a.deadline ? "\n* 기한 : " + a.deadline : ""}
+관심 있으신 분은 총무에게 알려 주세요~`;
+    return { band, talk };
   }
 };
 
@@ -635,6 +668,28 @@ function flowDefs() {
         { key:"name", q:"새 회원 성함은?", type:"text", textPrompt:"새로 가입한 회원 성함" },
         { key:"year", q:"출생연도는?", type:"text", textPrompt:"출생연도 (예: 64)" },
       ]
+    },
+    meeting: {
+      title: "임원회의 결과", gen: "meeting",
+      steps: [
+        { key:"date", q:"언제 회의였나요?", type:"choice", opts:[
+          { label:"어제", value:"어제", voice:["어제"] },
+          { label:"직접 입력", value:"__text__", voice:["직접","직접 입력"] } ],
+          textPrompt:"회의 날짜 (예: 7월 5일)" },
+        { key:"decisions", q:"결정된 내용은?", type:"text", textPrompt:"결정 사항 (여러 개면 쉼표로 — 예: 창립행사 4월 27일 확정, 회비 3만원)" },
+      ]
+    },
+    official: {
+      title: "협회 공문 전달", gen: "official",
+      steps: [
+        { key:"title", q:"무슨 공문인가요?", type:"text", textPrompt:"제목/행사명 (예: 심판 강습회 추천)" },
+        { key:"date", q:"일시는?", type:"text", textPrompt:"일시 (예: 7월 11일(토) 14시~18시)" },
+        { key:"target", q:"대상은 누구인가요?", type:"text", textPrompt:"대상 (예: 각 연합회 추천자)" },
+        { key:"deadline", q:"신청·추천 기한이 있나요?", type:"choice", opts:[
+          { label:"기한 입력", value:"__text__", voice:["입력","기한"] },
+          { label:"없음", value:"", voice:["없음","건너뛰기"] } ],
+          textPrompt:"기한 (예: 6월 30일까지)" },
+      ]
     }
   };
 }
@@ -709,6 +764,8 @@ function renderHome() {
     { icon:"trophy", label:"대회 응원", sub:"대진 + 화이팅", voice:"대회 응원|대회|응원", key:"cheer" },
     { icon:"flag", label:"시축식 안내", sub:"새해 첫 모임(1월 둘째 일요일)", voice:"시축식 안내|시축식", key:"opening" },
     { icon:"person", label:"신입 환영", sub:"이름 + 출생연도 소개", voice:"신입 환영|신입|환영", key:"welcome" },
+    { icon:"board", label:"임원회의 결과", sub:"결정사항 개조식 정리", voice:"임원회의 결과|임원회의|회의 결과", key:"meeting" },
+    { icon:"mail", label:"협회 공문 전달", sub:"일시·대상·기한 개조식", voice:"협회 공문|공문 전달|공문", key:"official" },
   ];
   more.forEach(m => screenEl.appendChild(bigBtn({...m, onClick:()=>{ speak(m.label + "를 시작할게요."); startFlow(m.key); }})));
 
